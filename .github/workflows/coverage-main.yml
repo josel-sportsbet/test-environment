@@ -7,16 +7,15 @@ on:
       - master
 
   workflow_dispatch:
-    head_commit:
-      author:
-        name:
-          description: 'Author name'
-          required: true
-          type: string
-        email:
-          description: 'Author email'
-          required: true
-          type: string
+    inputs:
+      name:
+        description: 'Author name'
+        required: true
+        type: string
+      email:
+        description: 'Author email'
+        required: true
+        type: string
       message:
         description: 'Message'
         required: true
