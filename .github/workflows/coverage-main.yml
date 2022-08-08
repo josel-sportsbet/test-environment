@@ -1,0 +1,48 @@
+name: Build - master
+
+on:
+  # run when a pr is merged to master
+  push:
+    branches:
+      - master
+
+  workflow_dispatch:
+    head_commit:
+      author:
+        name:
+          description: 'Author name'
+          required: true
+          type: string
+        email:
+          description: 'Author email'
+          required: true
+          type: string
+      message:
+        description: 'Message'
+        required: true
+        type: string
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{github.run_number}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Print Info
+        run: |
+          echo "GITHUB_WORKFLOW      ${GITHUB_WORKFLOW}"
+          echo github.event.head_commit.name is ${{ github.event.head_commit.name }}
+          echo "GITHUB_RUN_ID        ${GITHUB_RUN_ID}"
+          echo "GITHUB_RUN_NUMBER    ${GITHUB_RUN_NUMBER}"
+          echo "GITHUB_ACTOR         ${GITHUB_ACTOR}"
+          echo "GITHUB_SHA (commit)  ${GITHUB_SHA}"
+          echo "GITHUB_REF           ${GITHUB_REF}"
+          echo "BUILD_NUMBER         ${BUILD_NUMBER}"
+          echo "BUILD_VERSION        ${BUILD_VERSION}"
+          echo "DOCKER_IMAGE         ${DOCKER_IMAGE}"
+

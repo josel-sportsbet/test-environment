@@ -1,0 +1,32 @@
+name: Build - branch
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{github.run_number}}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      # just printing some information as in other build scripts
+      - name: Print Info
+        run: |
+          echo "GITHUB_WORKFLOW      ${GITHUB_WORKFLOW}"
+          echo "GITHUB_RUN_ID        ${GITHUB_RUN_ID}"
+          echo "GITHUB_RUN_NUMBER    ${GITHUB_RUN_NUMBER}"
+          echo "GITHUB_ACTOR         ${GITHUB_ACTOR}"
+          echo "GITHUB_SHA (commit)  ${GITHUB_SHA}"
+          echo "GITHUB_REF           ${GITHUB_REF}"
+          echo "BUILD_NUMBER         ${BUILD_NUMBER}"
