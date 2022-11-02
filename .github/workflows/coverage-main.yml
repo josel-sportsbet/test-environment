@@ -8,21 +8,20 @@ on:
 
   workflow_dispatch:
     inputs:
-      name:
+      AuthorName:
         description: 'Author name'
         required: true
         type: string
-      email:
+      AuthorEmail:
         description: 'Author email'
         required: true
         type: string
-      message:
+      AuthorMessage:
         description: 'Message'
         required: true
         type: string
 
 jobs:
-
   build:
 
     runs-on: ubuntu-latest
@@ -30,7 +29,9 @@ jobs:
       BUILD_NUMBER: ${{github.run_number}}
 
     steps:
-      - uses: actions/checkout@v2
+      - if: ${{ github.event.inputs.AuthorName  != '' }}
+        run: |
+          echo "::github.event.head_commit.author.name::${{ github.event.inputs.AuthorName }}"
 
       - name: Show GitHub context
         env:
@@ -40,8 +41,8 @@ jobs:
       - name: Print Info
         run: |
           echo "GITHUB_WORKFLOW      ${GITHUB_WORKFLOW}"
-          echo github.event.head_commit.name is ${{ github.event.head_commit.name }}
-          echo "Updated resulter base version (#${{github.run_number}}) - committed in Flutter-Global/smf-outcomes-resulter"
+          echo github.event.head_commit.author.name is ${{ github.event.head_commit.author.name }}
+          echo github.event.inputs is "${{ toJSON(github.event.inputs) }}"
           echo "GITHUB_RUN_ID        ${GITHUB_RUN_ID}"
           echo "GITHUB_RUN_NUMBER    ${GITHUB_RUN_NUMBER}"
           echo "GITHUB_ACTOR         ${GITHUB_ACTOR}"
@@ -50,4 +51,23 @@ jobs:
           echo "BUILD_NUMBER         ${BUILD_NUMBER}"
           echo "BUILD_VERSION        ${BUILD_VERSION}"
           echo "DOCKER_IMAGE         ${DOCKER_IMAGE}"
+
+  dispatch:
+    needs: build
+    strategy:
+      matrix:
+        repo: ['josel-sportsbet/cbb-test-environment']
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{github.run_number}}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Notify Clients
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.TEST_SECRET }}
+          repository: ${{matrix.repo}}
+          event-type: test-environment-publish
+          client-payload: '{"image_manifest": {"ImageName": "${{env.DOCKER_IMAGE}}", "ImageTag": "${{env.BUILD_VERSION}}"}, "github": ${{ toJson(github) }}}'
 
