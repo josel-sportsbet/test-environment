@@ -7,19 +7,6 @@ on:
       - master
 
   workflow_dispatch:
-    inputs:
-      AuthorName:
-        description: 'Author name'
-        required: true
-        type: string
-      AuthorEmail:
-        description: 'Author email'
-        required: true
-        type: string
-      AuthorMessage:
-        description: 'Message'
-        required: true
-        type: string
 
 jobs:
   build:
@@ -29,10 +16,6 @@ jobs:
       BUILD_NUMBER: ${{github.run_number}}
 
     steps:
-      - if: ${{ github.event.inputs.AuthorName  != '' }}
-        run: |
-          echo "::github.event.head_commit.author.name::${{ github.event.inputs.AuthorName }}"
-
       - name: Show GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
